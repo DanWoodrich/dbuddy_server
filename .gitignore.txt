@@ -1,2 +1,0 @@
-.Rhistory
-dbuddy_ex.cfg
