@@ -87,11 +87,16 @@ serve<-function(s){
   
   #before running the command, I need to inject the NAS outpath as the intended outpath. 
   
-  if(args[1]=='pull'){
+  if(args[1]=='pull'|("--out" %in% args)){
     
     #substitude nas_outfile into args
     nas_outfile = paste(comppath,"/output/",substr(request,1,nchar(request)-4),".csv",sep="")
-    args[3] = nas_outfile
+    if(args[1]=='pull'){
+      args[3] = nas_outfile
+    }else{
+      args[which(args=="--out")+1]= nas_outfile
+    }
+    
   }else{
     nas_outfile = paste(comppath,"/output/",request,sep="")
   }
