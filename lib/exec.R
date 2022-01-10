@@ -87,13 +87,15 @@ serve<-function(s){
   
   #before running the command, I need to inject the NAS outpath as the intended outpath. 
   
-  if(args[1]=='pull'|("--out" %in% args)){
+  if(args[1]=='pull'|args[1]=='pull_from_data'|("--out" %in% args)){
     
     #substitude nas_outfile into args
     nas_outfile = paste(comppath,"/output/",substr(request,1,nchar(request)-4),".csv",sep="")
     if(args[1]=='pull'){
       args[3] = nas_outfile
-    }else{
+    }else if(args[1]=='pull_from_data'){
+	  args[4] = nas_outfile
+	}else{
       args[which(args=="--out")+1]= nas_outfile
     }
     
@@ -104,17 +106,32 @@ serve<-function(s){
   #command = paste(c("dbuddy",args),collapse = " ")
   #print(command)
   
-  
+  #print(args)
   #log = system(command,intern=T)
-  if(any(args=="*")){
-    args[which(args=="*")]<-"'*'"
+  badsymbols = c("*","<",">")
+  if(any(args %in% badsymbols)){
+    badsymbols = badsymbols[which(badsymbols %in% args)]
+    for(n in 1:length(badsymbols)){
+	  if(badsymbols[n]=="<"){
+	    args[which(args==badsymbols[n])]<- 'lThan'
+      }else if(badsymbols[n]==">"){
+	    args[which(args==badsymbols[n])]<- 'gThan'
+      }else{
+      args[which(args==badsymbols[n])]<- paste("'",badsymbols[n],"'",sep="")
+	  }
+    }
   }
+  
+  print(args)
   
   #print(args)
   
   if(args[1]!='ping'){
     args= paste(args,collapse=" ")
+	#print(args)
     log <- system2("dbuddy",args, stdout=TRUE, stderr=TRUE)
+	
+	#print(log)
     
   }else{
     log<-paste("server online","\nuptime",s/3600/24,"days","\n",R.version$version.string)
