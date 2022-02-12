@@ -1,5 +1,3 @@
-
-
 standardwait<-function(path,bool){
   
   s=0
@@ -142,12 +140,15 @@ serve<-function(s){
   
   #print(log)
   
-  if(!file.exists(nas_outfile)){
-    
-    #if file not generated, as in the case of pulls and DML errors, save the log as the output file. 
-    writeLines(log, paste(comppath,"/output/",request,sep=""))
-    
-  }
+  #if file not generated, as in the case of pulls and DML errors, save the log as the output file. 
+  tryCatch(
+    {
+        invisible(readLines(con = nas_outfile, n = 1))
+    },
+    error = function(e){
+        writeLines(log, paste(comppath,"/output/",request,sep=""))
+    }
+  ) 
   
   #write the log as the output file. Or, write the output as the output file. 
   
